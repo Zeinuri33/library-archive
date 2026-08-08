@@ -141,7 +141,7 @@ export default function Dashboard({ stats, chart, recentSurats, recentDisposisis
                                 {today}
                             </p>
                             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                                Selamat datang kembali, {firstName} 👋
+                                Selamat datang kembali, {firstName}
                             </h1>
                             <p className="mt-2 text-sm leading-relaxed text-blue-100/90">
                                 Berikut ringkasan persuratan Perpustakaan Ibrahimy. Catat surat baru,
