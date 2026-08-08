@@ -8,10 +8,10 @@ export default function AppLogo() {
             </div>
             <div className="group-data-[collapsible=icon]:hidden ml-1 grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold text-sidebar-foreground">
-                    E-Arsip Ibrahimy
+                    E-Arsip 
                 </span>
                 <span className="truncate text-[11px] text-sidebar-foreground/50">
-                    Sistem Persuratan
+                    Perpustakaan Ibrahimy
                 </span>
             </div>
         </>
