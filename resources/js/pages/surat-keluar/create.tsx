@@ -1,0 +1,373 @@
+'use client'
+
+import { useForm } from '@inertiajs/react'
+import axios from 'axios'
+import { Loader2, Plus, Wand2, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import Heading from '@/components/heading'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
+import { Textarea } from '@/components/ui/textarea'
+import { SIFAT_OPTIONS } from '@/lib/surat'
+import type { Klasifikasi, TemplateNomor, Unit } from '@/types/surat'
+
+interface Props {
+    klasifikasis: Klasifikasi[]
+    units: Unit[]
+    templates: TemplateNomor[]
+}
+
+export default function CreateSuratKeluarModal({ klasifikasis, units, templates }: Props) {
+    const [open, setOpen] = useState(false)
+    const [fileNames, setFileNames] = useState<string[]>([])
+    const [preview, setPreview] = useState<string | null>(null)
+    const [previewLoading, setPreviewLoading] = useState(false)
+    const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        template_nomor_id: '',
+        no_surat: '',
+        tujuan_surat: '',
+        penerima: '',
+        tanggal_surat: '',
+        tanggal_kirim: '',
+        sifat: 'biasa',
+        klasifikasi_surat_id: '',
+        unit_pengolah_id: '',
+        perihal: '',
+        ringkasan: '',
+        files: [] as File[],
+    })
+
+    const loadPreview = () => {
+        if (!data.template_nomor_id) {
+            setPreview(null)
+
+            return
+        }
+
+        setPreviewLoading(true)
+        axios
+            .post('/template-nomor/preview', {
+                template_nomor_id: data.template_nomor_id,
+                tanggal_surat: data.tanggal_surat || undefined,
+                klasifikasi_surat_id: data.klasifikasi_surat_id || undefined,
+                unit_pengolah_id: data.unit_pengolah_id || undefined,
+                jenis: 'keluar',
+            })
+            .then((res) => setPreview(res.data.preview))
+            .catch(() => setPreview(null))
+            .finally(() => setPreviewLoading(false))
+    }
+
+    useEffect(() => {
+        if (!open) {
+return
+}
+
+        if (previewTimer.current) {
+clearTimeout(previewTimer.current)
+}
+
+        previewTimer.current = setTimeout(loadPreview, 250)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data.template_nomor_id, data.tanggal_surat, data.klasifikasi_surat_id, data.unit_pengolah_id, open])
+
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault()
+        post('/surat-keluar', {
+            onSuccess: () => {
+                setOpen(false)
+                reset()
+                setFileNames([])
+                setPreview(null)
+                toast('Surat keluar berhasil dibuat')
+            },
+            onError: () => toast('Gagal menyimpan. Periksa kembali isian.'),
+        })
+    }
+
+    const handleFiles = (files: FileList | null) => {
+        if (!files) {
+return
+}
+
+        const list = Array.from(files)
+        setData('files', list)
+        setFileNames(list.map((f) => f.name))
+    }
+
+    const selectedTemplate = templates.find((t) => String(t.id) === data.template_nomor_id)
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Buat Surat Keluar
+                </Button>
+            </DialogTrigger>
+
+            <DialogContent className="max-h-[92vh] overflow-y-auto">
+                <DialogHeader>
+                    <Heading
+                        variant="small"
+                        title="Buat Surat Keluar"
+                        description="Nomor surat dibuat otomatis sesuai template penomoran."
+                    />
+                    <Separator />
+                </DialogHeader>
+
+                <form onSubmit={submit} className="space-y-4">
+                    {/* Template Nomor */}
+                    <div className="space-y-2">
+                        <Label>Template Nomor Surat</Label>
+                        <Select
+                            value={data.template_nomor_id}
+                            onValueChange={(v) => setData('template_nomor_id', v)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Pilih template penomoran" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">Tanpa template (isi manual)</SelectItem>
+                                {templates.map((t) => (
+                                    <SelectItem key={t.id} value={String(t.id)}>
+                                        {t.nama} — {t.format}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.template_nomor_id && (
+                            <p className="text-xs text-red-500">{errors.template_nomor_id}</p>
+                        )}
+                    </div>
+
+                    {/* Live Preview */}
+                    {selectedTemplate && (
+                        <div className="rounded-lg border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-800 dark:bg-blue-950/30">
+                            <div className="mb-2 flex items-center justify-between">
+                                <span className="flex items-center gap-1.5 text-xs font-medium text-blue-700 dark:text-blue-400">
+                                    <Wand2 className="h-3.5 w-3.5" />
+                                    Pratinjau Nomor Surat
+                                </span>
+                                {previewLoading && (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                                )}
+                            </div>
+                            <p className="font-mono text-lg font-bold tracking-wide text-blue-800 dark:text-blue-300">
+                                {preview || '…'}
+                            </p>
+                            <p className="mt-1.5 text-[11px] leading-relaxed text-blue-700/80 dark:text-blue-400/70">
+                                Format: {selectedTemplate.format} · Reset per{' '}
+                                {selectedTemplate.reset_periode} · Digit{' '}
+                                {selectedTemplate.digit_nomor}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Manual No. Surat */}
+                    {!data.template_nomor_id && (
+                        <div className="space-y-2">
+                            <Label>No. Surat (manual) *</Label>
+                            <Input
+                                placeholder="Contoh: 001/PERPUS/I/2026"
+                                value={data.no_surat}
+                                onChange={(e) => setData('no_surat', e.target.value)}
+                            />
+                            {errors.no_surat && <p className="text-xs text-red-500">{errors.no_surat}</p>}
+                        </div>
+                    )}
+
+                    {/* Tujuan */}
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label>Tujuan Surat</Label>
+                            <Input
+                                placeholder="Instansi / tujuan surat"
+                                value={data.tujuan_surat}
+                                onChange={(e) => setData('tujuan_surat', e.target.value)}
+                            />
+                            {errors.tujuan_surat && <p className="text-xs text-red-500">{errors.tujuan_surat}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Penerima</Label>
+                            <Input
+                                placeholder="Nama penerima (opsional)"
+                                value={data.penerima}
+                                onChange={(e) => setData('penerima', e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Tanggal & Sifat */}
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        <div className="space-y-2">
+                            <Label>Tanggal Surat</Label>
+                            <Input
+                                type="date"
+                                value={data.tanggal_surat}
+                                onChange={(e) => setData('tanggal_surat', e.target.value)}
+                            />
+                            {errors.tanggal_surat && <p className="text-xs text-red-500">{errors.tanggal_surat}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Tanggal Kirim</Label>
+                            <Input
+                                type="date"
+                                value={data.tanggal_kirim}
+                                onChange={(e) => setData('tanggal_kirim', e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Sifat</Label>
+                            <Select value={data.sifat} onValueChange={(v) => setData('sifat', v)}>
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {SIFAT_OPTIONS.map((s) => (
+                                        <SelectItem key={s.value} value={s.value}>
+                                            {s.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    {/* Klasifikasi & Unit */}
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label>Klasifikasi Surat</Label>
+                            <Select
+                                value={data.klasifikasi_surat_id}
+                                onValueChange={(v) => setData('klasifikasi_surat_id', v)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih klasifikasi" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {klasifikasis.map((k) => (
+                                        <SelectItem key={k.id} value={String(k.id)}>
+                                            {k.kode} — {k.nama}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Unit Pengolah</Label>
+                            <Select
+                                value={data.unit_pengolah_id}
+                                onValueChange={(v) => setData('unit_pengolah_id', v)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih unit" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {units.map((u) => (
+                                        <SelectItem key={u.id} value={String(u.id)}>
+                                            {u.kode} — {u.nama}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Perihal *</Label>
+                        <Input
+                            placeholder="Perihal surat"
+                            value={data.perihal}
+                            onChange={(e) => setData('perihal', e.target.value)}
+                        />
+                        {errors.perihal && <p className="text-xs text-red-500">{errors.perihal}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Ringkasan / Isi</Label>
+                        <Textarea
+                            rows={3}
+                            placeholder="Ringkasan isi surat (opsional)"
+                            value={data.ringkasan}
+                            onChange={(e) => setData('ringkasan', e.target.value)}
+                        />
+                    </div>
+
+                    {/* Lampiran */}
+                    <div className="space-y-2">
+                        <Label>Lampiran</Label>
+                        <div className="flex items-center gap-3 rounded-lg border border-dashed p-4">
+                            <div className="flex-1">
+                                {fileNames.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        {fileNames.map((name, i) => (
+                                            <span
+                                                key={i}
+                                                className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs"
+                                            >
+                                                {name}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFileNames((prev) => prev.filter((_, idx) => idx !== i))
+                                                        setData('files', data.files.filter((_, idx) => idx !== i))
+                                                    }}
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <span className="text-sm text-muted-foreground">
+                                        Pilih file PDF/gambar/dokumen (maks. 10 file)
+                                    </span>
+                                )}
+                            </div>
+                            <label className="cursor-pointer">
+                                <span className="rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted">
+                                    Pilih File
+                                </span>
+                                <input
+                                    type="file"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => handleFiles(e.target.files)}
+                                />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3 pt-2">
+                        <Badge variant="outline" className="hidden sm:inline-flex">
+                            Nomor dibuat otomatis saat disimpan
+                        </Badge>
+                        <Button type="submit" disabled={processing} className="w-full sm:w-auto">
+                            Simpan Surat Keluar
+                        </Button>
+                    </div>
+                </form>
+            </DialogContent>
+        </Dialog>
+    )
+}
