@@ -153,7 +153,7 @@ return
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="max-h-[92vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <Heading
                         variant="small"
@@ -195,7 +195,7 @@ return
                                     <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                                 )}
                             </div>
-                            <p className="font-mono text-lg font-bold tracking-wide text-blue-800 dark:text-blue-300">
+                            <p className="font-mono text-lg font-bold tracking-wide break-words text-blue-800 dark:text-blue-300">
                                 {preview || '…'}
                             </p>
                             <p className="mt-1 text-[11px] text-muted-foreground">

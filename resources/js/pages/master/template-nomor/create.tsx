@@ -100,7 +100,7 @@ export default function CreateTemplateNomorModal({ placeholders }: Props) {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-h-[92vh] overflow-y-auto">
+            <DialogContent>
                 <DialogHeader>
                     <Heading
                         variant="small"

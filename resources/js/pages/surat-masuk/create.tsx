@@ -81,7 +81,7 @@ return
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-h-[92vh] overflow-y-auto">
+            <DialogContent>
                 <DialogHeader>
                     <Heading
                         variant="small"

@@ -125,7 +125,7 @@ return
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-h-[92vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <Heading
                         variant="small"
@@ -172,10 +172,10 @@ return
                                     <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                                 )}
                             </div>
-                            <p className="font-mono text-lg font-bold tracking-wide text-blue-800 dark:text-blue-300">
+                            <p className="font-mono text-lg font-bold tracking-wide break-words text-blue-800 dark:text-blue-300">
                                 {preview || '…'}
                             </p>
-                            <p className="mt-1.5 text-[11px] leading-relaxed text-blue-700/80 dark:text-blue-400/70">
+                            <p className="mt-1.5 text-[11px] leading-relaxed break-words text-blue-700/80 dark:text-blue-400/70">
                                 Format: {selectedTemplate.format} · Reset per{' '}
                                 {selectedTemplate.reset_periode} · Digit{' '}
                                 {selectedTemplate.digit_nomor}

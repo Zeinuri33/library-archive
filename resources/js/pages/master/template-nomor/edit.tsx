@@ -109,7 +109,7 @@ export default function EditTemplateNomorModal({ open, setOpen, item, placeholde
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="max-h-[92vh] overflow-y-auto">
+            <DialogContent>
                 <DialogHeader>
                     <Heading
                         variant="small"

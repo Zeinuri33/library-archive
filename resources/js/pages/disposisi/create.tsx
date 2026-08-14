@@ -65,7 +65,7 @@ export default function CreateDisposisiModal({ surats, users }: Props) {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-h-[92vh] overflow-y-auto">
+            <DialogContent>
                 <DialogHeader>
                     <Heading
                         variant="small"
