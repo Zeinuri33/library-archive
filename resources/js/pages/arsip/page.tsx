@@ -349,8 +349,8 @@ return
 
                 {/* Filters */}
                 <div className="rounded-xl border bg-card p-4 shadow-soft">
-                    <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-6">
-                        <div className="relative lg:col-span-2">
+                    <div className="space-y-3">
+                        <div className="relative">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input
                                 placeholder="Cari perihal, nomor, asal/tujuan..."
@@ -359,8 +359,9 @@ return
                                 onChange={(e) => setQ(e.target.value)}
                             />
                         </div>
+                        <div className="flex flex-wrap items-center justify-between gap-1 sm:flex-nowrap">
                         <Select value={jenis} onValueChange={setJenis}>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-40">
                                 <SelectValue placeholder="Jenis" />
                             </SelectTrigger>
                             <SelectContent>
@@ -370,7 +371,7 @@ return
                             </SelectContent>
                         </Select>
                         <Select value={tahun} onValueChange={setTahun}>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-40">
                                 <SelectValue placeholder="Tahun" />
                             </SelectTrigger>
                             <SelectContent>
@@ -383,7 +384,7 @@ return
                             </SelectContent>
                         </Select>
                         <Select value={sifat} onValueChange={setSifat}>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-44">
                                 <SelectValue placeholder="Sifat" />
                             </SelectTrigger>
                             <SelectContent>
@@ -395,7 +396,7 @@ return
                             </SelectContent>
                         </Select>
                         <Select value={statusArsip} onValueChange={setStatusArsip}>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-44">
                                 <SelectValue placeholder="Status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -404,38 +405,35 @@ return
                                 <SelectItem value="arsip">Arsip</SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
-                    <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                        <p className="text-sm text-muted-foreground">
-                            Menampilkan <b>{filtered.length}</b> dari <b>{surats.length}</b> surat
-                        </p>
-                        <div className="flex items-center gap-2">
-                            <Select value={klasifikasi} onValueChange={setKlasifikasi}>
-                                <SelectTrigger size="sm" className="h-8 w-52">
-                                    <SelectValue placeholder="Klasifikasi" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="semua">Semua Klasifikasi</SelectItem>
-                                    {klasifikasis.map((k) => (
-                                        <SelectItem key={k.id} value={String(k.id)}>
-                                            {k.kode} — {k.nama}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {hasFilters && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 gap-1 text-xs"
-                                    onClick={clearFilters}
-                                >
-                                    <FilterX className="h-3.5 w-3.5" />
-                                    Reset
-                                </Button>
-                            )}
+                        <Select value={klasifikasi} onValueChange={setKlasifikasi}>
+                            <SelectTrigger className="w-64">
+                                <SelectValue placeholder="Klasifikasi" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="semua">Semua Klasifikasi</SelectItem>
+                                {klasifikasis.map((k) => (
+                                    <SelectItem key={k.id} value={String(k.id)}>
+                                        {k.kode} — {k.nama}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {hasFilters && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-9 gap-1 text-xs"
+                                onClick={clearFilters}
+                            >
+                                <FilterX className="h-3.5 w-3.5" />
+                                Reset
+                            </Button>
+                        )}
                         </div>
                     </div>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                        Menampilkan <b>{filtered.length}</b> dari <b>{surats.length}</b> surat
+                    </p>
                 </div>
 
                 <DataTable columns={columns} data={filtered} />
