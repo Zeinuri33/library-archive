@@ -68,7 +68,7 @@ export default function EditDisposisiModal({ open, setOpen, disposisi, users }: 
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <Heading
                         variant="small"
@@ -116,23 +116,22 @@ export default function EditDisposisiModal({ open, setOpen, disposisi, users }: 
                         />
                     </div>
 
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-2">
-                            <Label>Catatan</Label>
-                            <Textarea
-                                rows={2}
-                                value={data.catatan}
-                                onChange={(e) => setData('catatan', e.target.value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Batas Waktu</Label>
-                            <Input
-                                type="date"
-                                value={data.batas_waktu}
-                                onChange={(e) => setData('batas_waktu', e.target.value)}
-                            />
-                        </div>
+                    <div className="space-y-2">
+                        <Label>Batas Waktu</Label>
+                        <Input
+                            type="date"
+                            value={data.batas_waktu}
+                            onChange={(e) => setData('batas_waktu', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Catatan</Label>
+                        <Textarea
+                            rows={2}
+                            value={data.catatan}
+                            onChange={(e) => setData('catatan', e.target.value)}
+                        />
                     </div>
 
                     <div className="space-y-2">

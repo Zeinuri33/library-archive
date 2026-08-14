@@ -56,6 +56,8 @@ export default function CreateDisposisiModal({ surats, users }: Props) {
         })
     }
 
+    const selectedSurat = surats.find((s) => String(s.id) === data.surat_id)
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -65,7 +67,7 @@ export default function CreateDisposisiModal({ surats, users }: Props) {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <Heading
                         variant="small"
@@ -80,12 +82,21 @@ export default function CreateDisposisiModal({ surats, users }: Props) {
                         <Label>Surat *</Label>
                         <Select value={data.surat_id} onValueChange={(v) => setData('surat_id', v)}>
                             <SelectTrigger>
-                                <SelectValue placeholder="Pilih surat yang akan didisposisi" />
+                                <SelectValue placeholder="Pilih surat yang akan didisposisi">
+                                    {selectedSurat ? selectedSurat.perihal : null}
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                                 {surats.map((s) => (
-                                    <SelectItem key={s.id} value={String(s.id)}>
-                                        [{s.jenis === 'masuk' ? 'Masuk' : 'Keluar'}] {s.no_surat || s.no_agenda || '-'} — {s.perihal} ({formatTanggal(s.tanggal_surat)})
+                                    <SelectItem key={s.id} value={String(s.id)} className="whitespace-normal py-2">
+                                        <span className="flex min-w-0 flex-col gap-0.5">
+                                            <span className="text-xs text-muted-foreground">
+                                                [{s.jenis === 'masuk' ? 'Masuk' : 'Keluar'}] · {formatTanggal(s.tanggal_surat)}
+                                            </span>
+                                            <span className="truncate font-medium">
+                                                {s.no_surat || s.no_agenda || '-'} — {s.perihal}
+                                            </span>
+                                        </span>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -132,24 +143,23 @@ export default function CreateDisposisiModal({ surats, users }: Props) {
                         />
                     </div>
 
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-2">
-                            <Label>Catatan</Label>
-                            <Textarea
-                                rows={2}
-                                placeholder="Catatan tambahan (opsional)"
-                                value={data.catatan}
-                                onChange={(e) => setData('catatan', e.target.value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Batas Waktu</Label>
-                            <Input
-                                type="date"
-                                value={data.batas_waktu}
-                                onChange={(e) => setData('batas_waktu', e.target.value)}
-                            />
-                        </div>
+                    <div className="space-y-2">
+                        <Label>Batas Waktu</Label>
+                        <Input
+                            type="date"
+                            value={data.batas_waktu}
+                            onChange={(e) => setData('batas_waktu', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Catatan</Label>
+                        <Textarea
+                            rows={2}
+                            placeholder="Catatan tambahan (opsional)"
+                            value={data.catatan}
+                            onChange={(e) => setData('catatan', e.target.value)}
+                        />
                     </div>
 
                     <div className="pt-2">
